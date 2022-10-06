@@ -34,13 +34,14 @@ function kubectl_ext() {
     local num_pods=$(gum spin --show-output --title="Checking requirements" \
                     -- kubectl -n "${namespace}" get pods --no-headers -l "${label}" | wc -l)
 
-    if [[ ${num_pods} -gt 0 ]]; then
+    # Default max pods is 8, prompt to confirm before overwriting
+    if [[ ${num_pods} -gt 8 ]]; then
       if ! gum confirm "Tail ${num_pods} pods?"; then
         gum format 'Too many pods, quitting.'
         exit 1
       fi
     fi
-    gum format '# Taling logs in `${namespace}` with the label `${label}`'
+    gum format 'Taling logs in `${namespace}` with the label `${label}`'
     kubectl -n "${namespace}" logs -l "${label}" --follow --max-log-requests="${num_pods}"
     return 0
 }
