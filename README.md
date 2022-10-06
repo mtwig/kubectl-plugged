@@ -25,12 +25,20 @@ kubectl -n namespace_the_name log some-interesting-pod-name --follow
 
 ### Usage
 ```bash
+# No args
 kubectl flog
+
+# Default to current namespace
+kubectl flog .
+
+# Prepopulate the filter with a value
+kubectl flog dev
 ```
 
 ## Follow log by label (flogl)
 
 See details for flog. This workflow is the same, except you're prompted for pod labels instead of pod names.
+
 
 ## Installation
 

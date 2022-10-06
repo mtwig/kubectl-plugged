@@ -14,10 +14,19 @@ if ! command -v rg > /dev/null 2>&1; then
 fi
 
 function kubectl_ext() {
+    
+    local current_namespace=""
+    if [[ ${1} == '.' ]]; then
+      current_namespace=$(kubectl config view --minify -o jsonpath='{..namespace}')
+    else 
+      current_namespace="${1}"
+    fi
+
     local namespace=$(gum spin --show-output --title="Fetching namespace list"\
                         -- kubectl get namespace --no-headers -o custom-columns=":metadata.name" \
-                        | gum filter)
-    
+                        | gum filter --placeholder="Pick a namespace" --value="${current_namespace}")
+ 
+
     if [[ ${namespace} == "" ]]; then
         gum format "No namespace selected"
         return 1
@@ -41,9 +50,9 @@ function kubectl_ext() {
         exit 1
       fi
     fi
-    gum format 'Taling logs in `${namespace}` with the label `${label}`'
+    gum format 'Taling logs in `'${namespace}'` with the label `'${label}'`'
     kubectl -n "${namespace}" logs -l "${label}" --follow --max-log-requests="${num_pods}"
     return 0
 }
 
-kubectl_ext
+kubectl_ext "${@}"
