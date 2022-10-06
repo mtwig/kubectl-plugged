@@ -32,4 +32,9 @@ kubectl flog
 
 See details for flog. This workflow is the same, except you're prompted for pod labels instead of pod names.
 
+## Installation
+
+This repository does not currently provide a fancy installation script. For this repository to be "installed", and plugins made available to kubectl, do the following:
+1. Clone this repository somewhere on your computer (Recommend `${XDG_HOME:${HOME}}/.kubectl-plugged`).
+1. Add the `bin` directory to your `PATH`
 
