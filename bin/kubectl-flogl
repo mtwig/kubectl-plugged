@@ -1,13 +1,13 @@
 #!/bin/bash
 set -e
 
-if ! command -v gum > /dev/null 2>1; then
+if ! command -v gum > /dev/null 2>&1; then
   printf 'Unable to run plugin, gum required\n'
   printf 'For installation instructions see https://github.com/charmbracelet/gum#installation\n'
   exit 1
 fi
 
-if ! command -v rg > /dev/null 2>1; then
+if ! command -v rg > /dev/null 2>&1; then
   printf 'Unable to run plugin, rg required\n'
   printf 'For installation instructions see https://github.com/BurntSushi/ripgrep#installation\n'
   exit 1

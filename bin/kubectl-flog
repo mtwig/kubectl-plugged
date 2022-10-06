@@ -1,16 +1,17 @@
 #!/bin/bash
 set -e
 
-if ! command -v gum > /dev/null 2>1; then
+if ! command -v gum > /dev/null 2>&1; then
   printf 'Unable to run plugin, gum required\n'
   printf 'For installation instructions see https://github.com/charmbracelet/gum#installation\n'
   exit 1
 fi
 
 function kubectl_ext() {
+    local current_namespace=$(kubectl config view --minify -o jsonpath='{..namespace}')
     local namespace=$(gum spin --show-output --title="Fetching namespace list"\
                         -- kubectl get namespace --no-headers -o custom-columns=":metadata.name" \
-                        | gum filter)
+                        | gum filter )
     
     if [[ ${namespace} == "" ]]; then
         echo "No namespace selected"

@@ -5,7 +5,7 @@
 set -e
 
 # Check dependencies of this script
-if ! command -v gum > /dev/null 2>1; then
+if ! command -v gum > /dev/null 2>&1; then
   printf 'Unable to run plugin, gum required\n'
   printf 'For installation instructions see https://github.com/charmbracelet/gum#installation\n'
   exit 1
