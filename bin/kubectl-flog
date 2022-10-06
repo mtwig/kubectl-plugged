@@ -1,0 +1,36 @@
+#!/bin/bash
+set -e
+
+if ! command -v gum > /dev/null 2>1; then
+  printf 'Unable to run plugin, gum required\n'
+  printf 'For installation instructions see https://github.com/charmbracelet/gum#installation\n'
+  exit 1
+fi
+
+function kubectl_ext() {
+    local namespace=$(gum spin --show-output --title="Fetching namespace list"\
+                        -- kubectl get namespace --no-headers -o custom-columns=":metadata.name" \
+                        | gum filter)
+    
+    if [[ ${namespace} == "" ]]; then
+        echo "No namespace selected"
+        return 1
+    fi
+
+    local pod=$(gum spin --show-output --title="Fetching pods in ${namespace}" \
+                -- kubectl -n "${namespace}" get pods --no-headers -o custom-columns=":metadata.name" \
+                | gum filter)
+    
+    if [[ ${pod} == "" ]]; then
+        echo "No pod selected"
+        return 1
+    fi
+
+    gum format "Showing logs for ${namespace}/${pod}"
+
+    
+    kubectl -n "${namespace}" logs "${pod}" --follow
+    return 0
+}
+
+kubectl_ext

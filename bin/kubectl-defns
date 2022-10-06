@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# Interactively set the default namespace for kubectl
+
+set -e
+
+# Check dependencies of this script
+if ! command -v gum > /dev/null 2>1; then
+  printf 'Unable to run plugin, gum required\n'
+  printf 'For installation instructions see https://github.com/charmbracelet/gum#installation\n'
+  exit 1
+fi
+
+# Plugin logic
+function kubectl_ext() {
+    local namespace=$(gum spin --show-output --title="Fetching namespace list"\
+                        -- kubectl get namespace --no-headers -o custom-columns=":metadata.name" \
+                        | gum filter)
+    
+    if [[ ${namespace} == "" ]]; then
+        echo "No namespace selected"
+        return 1
+    fi
+  kubectl config set-context --current --namespace="${namespace}"
+  return 0
+}
+
+kubectl_ext
