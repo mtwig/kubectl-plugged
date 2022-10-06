@@ -1,0 +1,48 @@
+#!/bin/bash
+set -e
+
+if ! command -v gum > /dev/null 2>1; then
+  printf 'Unable to run plugin, gum required\n'
+  printf 'For installation instructions see https://github.com/charmbracelet/gum#installation\n'
+  exit 1
+fi
+
+if ! command -v rg > /dev/null 2>1; then
+  printf 'Unable to run plugin, rg required\n'
+  printf 'For installation instructions see https://github.com/BurntSushi/ripgrep#installation\n'
+  exit 1
+fi
+
+function kubectl_ext() {
+    local namespace=$(gum spin --show-output --title="Fetching namespace list"\
+                        -- kubectl get namespace --no-headers -o custom-columns=":metadata.name" \
+                        | gum filter)
+    
+    if [[ ${namespace} == "" ]]; then
+        gum format "No namespace selected"
+        return 1
+    fi
+
+    local label=$(gum spin --show-output --title="Fetching labels in ${namespace}" \
+             -- kubectl -n "${namespace}" get pods --no-headers -o custom-columns=':metadata.labels' \
+                | rg -o 'map\[(.*)\]' -r '$1' \
+                | rg -o --multiline '[^\s]+' \
+                | rg ':' -r '=' \
+                | sort -u\
+                | gum filter) 
+    
+    local num_pods=$(gum spin --show-output --title="Checking requirements" \
+                    -- kubectl -n "${namespace}" get pods --no-headers -l "${label}" | wc -l)
+
+    if [[ ${num_pods} -gt 0 ]]; then
+      if ! gum confirm "Tail ${num_pods} pods?"; then
+        gum format 'Too many pods, quitting.'
+        exit 1
+      fi
+    fi
+    gum format '# Taling logs in `${namespace}` with the label `${label}`'
+    kubectl -n "${namespace}" logs -l "${label}" --follow --max-log-requests="${num_pods}"
+    return 0
+}
+
+kubectl_ext
