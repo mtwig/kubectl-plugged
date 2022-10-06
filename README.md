@@ -46,3 +46,8 @@ This repository does not currently provide a fancy installation script. For this
 1. Clone this repository somewhere on your computer (Recommend `${XDG_HOME:${HOME}}/.kubectl-plugged`).
 1. Add the `bin` directory to your `PATH`
 
+### Prerequisites
+
+Each plugin will try and check it's own dependencies, and give an error if it's missing. Some useful utilities which these plugins use:
+* [Gum](https://github.com/charmbracelet/gum#installation) (to make the output nicer)
+* [Ripgrep](http://github.com/BurntSushi/ripgrep#installation) (say no to `grep`)
